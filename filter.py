@@ -1,5 +1,6 @@
 import re
 import math
+import json
 from os import listdir
 from collections import defaultdict
 
@@ -90,11 +91,20 @@ def spam_probability(word_probabilities, message, spam_total, ham_total):
     return spam/(spam+ham), ham/(spam+ham)
     
 
+def write_to_file(PATHS):
+    counts = count_words(file_names(PATHS))
+    with open('probabilities.txt', 'w') as outfile:
+        json.dump(counts, outfile)
+       
+
+def get_counts():
+    with open('probabilities.txt') as infile:
+        return json.load(infile)
+
+        
 ham_total = count_path_total(PATHS[0])
 spam_total = count_path_total(PATHS[1])
-
-counts = count_words(file_names(PATHS))
-
+counts = get_counts()        
 word_probs = word_probabilities(counts, spam_total, ham_total)
 
 message = '''It is truly incredible - People from all around the world are using
@@ -102,11 +112,16 @@ their webcams to get off. Now is your chance to watch Men and women,
 boys and girls show off just for you. Best of all, it's FREE, LIVE
 and UN-F*CKING-BELIEVABLE. Either peep in on the sexy activity or
 participate with your own webcam! You've got to try this out!
-
-
 Open Amateur Webcam Feeds are Active RIGHT NOW!!!'''
 
 print spam_probability(word_probs, message, spam_total, ham_total)
 
-
+class NaiveBayes(object):
+    _spam_total = None
+    _ham_total = None
+    _PATHS = None
+    _message = None
+    
+    def __init__(self, message):
+        self._spam_total = count_path_total(PATHS[1]) 
 
